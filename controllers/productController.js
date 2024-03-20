@@ -3,7 +3,12 @@ const Product = require('../models/Product');
 
 
 exports.listProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({});
+    let queryFilter = {};
+
+    if (req.user && req.user.role === 'seller') {
+        queryFilter.seller = req.user._id;
+    }
+    const products = await Product.find(queryFilter);
   
     res.json(products);
 });
