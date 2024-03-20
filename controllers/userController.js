@@ -14,15 +14,13 @@ exports.registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, role, paypalEmail } = req.body;
 
   if (!email || !password || !username) {
-    res.status(400);
-    throw new Error('Please add all fields');
+    res.status(400).send('Please add all fields');
   }
 
   // Check if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
+    res.status(400).send('User already exists');
   }
 
   const user = await User.create({
@@ -43,8 +41,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    res.status(400);
-    throw new Error('Invalid user data');
+    res.status(400).send('Invalid user data');
   }
 });
 
@@ -64,8 +61,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    res.status(401);
-    throw new Error('Invalid credentials');
+    res.status(401).send('Invalid credentials');
   }
 });
 
