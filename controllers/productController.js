@@ -1,68 +1,97 @@
+const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
 
-exports.createProduct = async (req, res) => {
-  const { name, description, price, imageUrl, category } = req.body;
-  try {
-    const newProduct = await Product.create({
-      name,
-      description,
-      price,
-      imageUrl,
-      category,
-      seller: req.user._id, 
+
+exports.listProducts = asyncHandler(async (req, res) => {
+    const products = await Product.find({});
+  
+    res.json(products);
+});
+
+
+exports.createProduct = asyncHandler(async (req, res) => {
+    const { name, description, price, imageUrl, category } = req.body;
+    
+    if (!req.user || req.user.role !== 'seller') {
+        res.status(401);
+        throw new Error('Not authorized as seller');
+    }
+
+    const product = new Product({
+        name,
+        description,
+        price,
+        imageUrl,
+        category,
+        seller: req.user._id,
     });
-    res.status(201).json(newProduct);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 
-exports.getProducts = async (req, res) => {
-  try {
-    const products = await Product.find().populate('category', 'name');
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+});
 
-exports.getProductById = async (req, res) => {
-  try {
+
+exports.getProductById = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
-exports.updateProduct = async (req, res) => {
-  const { name, description, price, imageUrl, category } = req.body;
-  try {
-    const product = await Product.findOneAndUpdate(
-      { _id: req.params.id, seller: req.user._id },
-      { name, description, price, imageUrl, category },
-      { new: true }
-    );
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found or not authorized' });
+    if (product) {
+        res.json(product);
+    } else {
+        res.status(404);
+        throw new Error('Product not found');
     }
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+});
 
-exports.deleteProduct = async (req, res) => {
-  try {
-    const product = await Product.findOneAndDelete({ _id: req.params.id, seller: req.user._id });
+
+
+
+
+exports.updateProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found or not authorized' });
+        res.status(404);
+        throw new Error('Product not found');
     }
-    res.status(200).json({ message: 'Product successfully deleted' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User not authorized');
+    }
+
+    const userIdString = req.user._id.toString();
+    const sellerIdString = product.seller ? product.seller.toString() : '';
+
+    if (userIdString !== sellerIdString) {
+        res.status(401);
+        throw new Error('Not authorized to update this product');
+    }
+
+    product.name = req.body.name || product.name;
+    product.description = req.body.description || product.description;
+    product.price = req.body.price || product.price;
+    product.imageUrl = req.body.imageUrl || product.imageUrl;
+    product.category = req.body.category || product.category;
+
+    const updatedProduct = await product.save();
+    res.json(updatedProduct);
+});
+
+
+exports.deleteProduct = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        res.status(404).send({ message: 'Could not find product' });
+        return;
+    }
+
+    if (!req.user || req.user._id.toString() !== product.seller.toString()) {
+        res.status(401);
+        throw new Error('Not authorized to delete this product');
+    }
+
+
+    await Product.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Product removed' });
+});
