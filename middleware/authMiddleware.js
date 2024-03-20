@@ -45,7 +45,6 @@ const restrictTo = (...roles) => {
     });
 };
 
-module.exports = { protect, restrictTo };
 
 
 const optionalAuth = async (req, res, next) => {
@@ -57,12 +56,11 @@ const optionalAuth = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use your JWT secret here
             req.user = await User.findById(decoded.id).select('-password');
         } catch (error) {
-            // Log the error but do not block the request
             console.error("Optional auth error:", error.message);
         }
     }
     next();
 };
 
-module.exports = optionalAuth;
+module.exports = { protect, restrictTo ,optionalAuth};
 
