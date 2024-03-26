@@ -37,8 +37,6 @@ exports.updateBuyerOrder = async (req, res) => {
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
-        // Update order fields as needed (e.g., quantity, product)
-        // Ensure that updates are valid and do not violate any business rules
         await order.save();
         res.status(200).json({ message: 'Order updated successfully', order });
     } catch (error) {
