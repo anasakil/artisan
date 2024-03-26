@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
-const Subscription = require('../models/Subscription'); 
+const Subscription = require('../models/Subscription');
 
 
 
@@ -10,15 +10,39 @@ exports.listProducts = asyncHandler(async (req, res) => {
     if (req.user && req.user.role === 'seller') {
         queryFilter.seller = req.user._id;
     }
-    const products = await Product.find(queryFilter);
-  
-    res.json(products);
+
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Query for fetching products
+    let query = Product.find(queryFilter).skip(skip).limit(limit);
+
+    // Count total products for pagination
+    const totalProducts = await Product.countDocuments(queryFilter);
+
+    // Validate page existence
+    if (skip >= totalProducts) {
+        throw new Error("This page does not exist");
+    }
+
+    // Execute the query
+    const products = await query;
+
+    res.json({
+        page,
+        limit,
+        totalProducts,
+        products
+    });
 });
+
 
 
 exports.createProduct = asyncHandler(async (req, res) => {
     const { name, description, price, imageUrl, category } = req.body;
-    
+
     if (!req.user || req.user.role !== 'seller') {
         res.status(401);
         throw new Error('Not authorized as seller');
@@ -27,7 +51,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
     const activeSubscription = await Subscription.findOne({
         seller: req.user._id,
         status: 'active',
-        endDate: { $gte: new Date() } 
+        endDate: { $gte: new Date() }
     });
 
     if (!activeSubscription) {
@@ -99,7 +123,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
     if (!product) {
         res.status(404).send({ message: 'Could not find product' });
-     
+
     }
 
     if (!req.user || req.user._id.toString() !== product.seller.toString()) {
