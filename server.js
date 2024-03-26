@@ -1,11 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const connectDB = require('./config/db.js');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 
 
@@ -21,6 +23,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/users', authRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/orders', orderRoutes);
+
 
 
 
