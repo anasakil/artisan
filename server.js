@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -8,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 
 
@@ -24,8 +26,9 @@ app.use('/api/users', authRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/upload', uploadRoutes);
 
-
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 
 
