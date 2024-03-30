@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Order = require('../models/Order'); 
 const Product = require('../models/Product'); 
 const User = require('../models/User'); 
@@ -16,8 +15,7 @@ exports.placeOrder = async (req, res) => {
 
         const sellerId = productDetails[0].seller;
         const seller = await User.findById(sellerId);
-        console.log('Seller ID:', sellerId);
-        console.log('Seller Data:', seller);
+       
 
         if (!seller || !seller.stripeAccountId && !seller[' stripeAccountId']) {
             return res.status(404).json({ message: 'Seller not found or not set up for payments' });
