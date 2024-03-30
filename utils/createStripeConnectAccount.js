@@ -4,7 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 async function createStripeConnectAccount(sellerDetails) {
     try {
         const account = await stripe.accounts.create({
-            type: 'express', // or 'standard' or 'custom', depending on your needs
+            type: 'express',
             country: 'US',
             email: sellerDetails.email,
             capabilities: {
@@ -41,7 +41,6 @@ async function createStripeConnectAccount(sellerDetails) {
 // const app = express();
 // const PORT = 3000;
 
-// // Route to initiate onboarding for a hardcoded Stripe Connect account
 // app.get('/start-onboarding', async (req, res) => {
 //     try {
 //         const accountLink = await stripe.accountLinks.create({
@@ -51,7 +50,6 @@ async function createStripeConnectAccount(sellerDetails) {
 //             type: 'account_onboarding',
 //         });
 
-//         // Redirect the user to Stripe's hosted onboarding flow
 //         res.redirect(accountLink.url);
 //     } catch (error) {
 //         console.error('Failed to create account link:', error);
