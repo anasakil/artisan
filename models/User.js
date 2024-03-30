@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['buyer', 'seller', 'admin'], default: 'buyer' },
+  stripeAccountId: { type: String },
   paypalEmail: { type: String, required: function() { return this.role === 'seller'; } },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

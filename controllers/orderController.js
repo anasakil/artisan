@@ -1,25 +1,65 @@
-const Order = require('../models/Order');
-const Product = require('../models/Product');
-
+const mongoose = require('mongoose');
+const Order = require('../models/Order'); 
+const Product = require('../models/Product'); 
+const User = require('../models/User'); 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.placeOrder = async (req, res) => {
     try {
-        const products = await Product.find({ _id: { $in: req.body.products.map(item => item.product) } });
-        const sellerId = products[0].seller; 
+        const { products, paymentMethodId } = req.body; 
+        const productIds = products.map(item => item.product);
+        const productDetails = await Product.find({ '_id': { $in: productIds } });
+
+        if (productDetails.length === 0) {
+            return res.status(400).json({ message: 'Products not found' });
+        }
+
+        const sellerId = productDetails[0].seller;
+        const seller = await User.findById(sellerId);
+        console.log('Seller ID:', sellerId);
+        console.log('Seller Data:', seller);
+
+        if (!seller || !seller.stripeAccountId && !seller[' stripeAccountId']) {
+            return res.status(404).json({ message: 'Seller not found or not set up for payments' });
+        }
+
+
+
+        if (!seller || !seller.stripeAccountId) {
+            return res.status(404).json({ message: 'Seller not found or not set up for payments' });
+        }
+
+        const totalAmount = productDetails.reduce((acc, product) => acc + product.price, 0);
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: totalAmount*100,
+            currency: 'usd',
+            payment_method: paymentMethodId,
+            automatic_payment_methods: {
+                enabled: true,
+                allow_redirects: 'never',
+            },
+            transfer_data: {
+                destination: seller.stripeAccountId,
+            },
+        });
 
         const order = new Order({
-            products: req.body.products,
-            buyer: req.user._id,
+            products: products,
+            buyer: req.user._id, 
             seller: sellerId,
-            status: 'placed'
+            status: 'placed',
+            paymentIntentId: paymentIntent.id,
         });
 
         await order.save();
         res.status(201).json({ message: 'Order placed successfully', order });
     } catch (error) {
+        console.error('Error placing order:', error);
         res.status(500).json({ message: 'Error placing order', error: error.message });
     }
 };
+
 
 exports.viewOrderHistory = async (req, res) => {
     try {
@@ -30,7 +70,6 @@ exports.viewOrderHistory = async (req, res) => {
     }
 };
 
-// Function for buyer to update their order
 exports.updateBuyerOrder = async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.orderId, buyer: req.user._id });
@@ -44,7 +83,6 @@ exports.updateBuyerOrder = async (req, res) => {
     }
 };
 
-// Function for buyer to delete their order
 exports.deleteBuyerOrder = async (req, res) => {
     try {
         const order = await Order.findOneAndDelete({ _id: req.params.orderId, buyer: req.user._id });
@@ -63,7 +101,6 @@ exports.deleteBuyerOrder = async (req, res) => {
 
 
 
-// Fetch orders for a seller's products
 exports.getSellerOrders = async (req, res) => {
     try {
         const orders = await Order.find({ seller: req.user._id }).populate('products.product');
@@ -75,7 +112,6 @@ exports.getSellerOrders = async (req, res) => {
 
 
 
-// Function to update an order for a seller's product
 exports.updateSellerOrder = async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.orderId, seller: req.user._id });
