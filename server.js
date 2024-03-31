@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const swaggerUi = require('swagger-ui-express'); // Import swagger-ui-express
+const swaggerSpecs = require('./swagger/swaggerSpecs');
 
 
 
@@ -28,10 +30,12 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/orders', orderRoutes);
 
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
-
-
-
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  });
 
 const PORT = process.env.PORT || 5000;
 
