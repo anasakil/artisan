@@ -5,7 +5,7 @@ info:
   description: API documentation for Artisan application's product management
 
 paths:
-  /products:
+  api/products:
     get:
       summary: List all products
       tags:
@@ -43,7 +43,7 @@ paths:
         roles:
           - seller
 
-  /products/{id}:
+  api/products/{id}:
     get:
       summary: Get a product by ID
       tags:
