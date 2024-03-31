@@ -1,0 +1,169 @@
+paths:
+  /api/buyer:
+    post:
+      summary: Place a new order
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        201:
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /api/buyer/myorders:
+    get:
+      summary: View order history for the buyer
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /api/buyer/orders/{orderId}:
+    put:
+      summary: Update a buyer's order
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        200:
+          description: Order updated successfully
+
+    delete:
+      summary: Delete a buyer's order
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Order deleted successfully
+
+  /api/seller/orders:
+    get:
+      summary: Get orders for the seller
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /api/seller/orders/{orderId}:
+    put:
+      summary: Update a seller's order
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        200:
+          description: Order updated successfully
+
+    delete:
+      summary: Delete a seller's order
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Order deleted successfully
+
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+                description: ID of the product
+              quantity:
+                type: number
+                description: Quantity of the product
+        buyer:
+          type: string
+          description: ID of the buyer
+        seller:
+          type: string
+          description: ID of the seller
+        status:
+          type: string
+          enum: [placed, shipped, delivered, cancelled]
+          default: placed
+        createdAt:
+          type: string
+          format: date-time
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
