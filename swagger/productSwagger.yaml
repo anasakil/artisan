@@ -5,7 +5,7 @@ info:
   description: API documentation for Artisan application's product management
 
 paths:
-  /api/products:
+  /products:
     get:
       summary: List all products
       tags:
@@ -24,6 +24,8 @@ paths:
       summary: Create a new product
       tags:
         - Products
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -37,6 +39,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+      x-restrictTo:
+        roles:
+          - seller
 
   /products/{id}:
     get:
@@ -61,6 +66,8 @@ paths:
       summary: Update a product by ID
       tags:
         - Products
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -80,11 +87,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+      x-restrictTo:
+        roles:
+          - seller
 
     delete:
       summary: Delete a product by ID
       tags:
         - Products
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -94,6 +106,9 @@ paths:
       responses:
         204:
           description: Product deleted successfully
+      x-restrictTo:
+        roles:
+          - seller
 
 components:
   schemas:
@@ -135,3 +150,9 @@ components:
           type: string
           format: date-time
           example: '2021-10-15T14:30:00.000Z'
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

@@ -1,5 +1,5 @@
 paths:
-  /api/categories:
+  /api/category:
     get:
       summary: Get all categories
       tags:
