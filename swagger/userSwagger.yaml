@@ -1,0 +1,147 @@
+paths:
+  /api/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /api/login:
+    post:
+      summary: Login a user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for authentication
+
+  /api/profile:
+    get:
+      summary: Get user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+    put:
+      summary: Update user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        200:
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'john_doe'
+        email:
+          type: string
+          example: 'john@example.com'
+        role:
+          type: string
+          enum: ['buyer', 'seller', 'admin']
+          example: 'buyer'
+        stripeAccountId:
+          type: string
+          example: 'acct_123ABC'
+        paypalEmail:
+          type: string
+          example: 'john_paypal@example.com'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'john_doe'
+        email:
+          type: string
+          example: 'john@example.com'
+        password:
+          type: string
+          example: 'password123'
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          example: 'john@example.com'
+        password:
+          type: string
+          example: 'password123'
+
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'john_doe_updated'
+        email:
+          type: string
+          example: 'john_updated@example.com'
+        password:
+          type: string
+          example: 'newpassword123'
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
