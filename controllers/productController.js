@@ -10,10 +10,33 @@ exports.listProducts = asyncHandler(async (req, res) => {
     if (req.user && req.user.role === 'seller') {
         queryFilter.seller = req.user._id;
     }
+
+    if (req.query.minPrice && req.query.maxPrice) {
+        queryFilter.price = { $gte: req.query.minPrice, $lte: req.query.maxPrice };
+    } else if (req.query.minPrice) {
+        queryFilter.price = { $gte: req.query.minPrice };
+    } else if (req.query.maxPrice) {
+        queryFilter.price = { $lte: req.query.maxPrice };
+    }
+
+    if (req.query.category) {
+        queryFilter.category = req.query.category;
+    }
+
+    if (req.query.seller) {
+        queryFilter.seller = req.query.seller;
+    }
+
+    
+    if (req.query.name) {
+        queryFilter.name = { $regex: req.query.name, $options: 'i' };
+    }
+
     const products = await Product.find(queryFilter);
-  
+
     res.json(products);
 });
+
 
 
 exports.createProduct = asyncHandler(async (req, res) => {
