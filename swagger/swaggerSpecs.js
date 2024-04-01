@@ -1,4 +1,3 @@
-// swagger/swaggerSpecs.js
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerOptions = require('./swaggerOptions');
 

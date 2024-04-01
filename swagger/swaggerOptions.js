@@ -8,6 +8,7 @@ const options = {
     },
   },
   apis: ['./routes/*.js', './swagger/*.yaml'], 
+  
 };
 
 module.exports = options;
