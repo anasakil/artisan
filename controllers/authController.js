@@ -28,7 +28,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     role,
-    paypalEmail,
+    stripeAccountId,
   });
 
   if (user) {
