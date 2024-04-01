@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
+const Subscription = require('../models/Subscription'); 
+
 
 
 exports.listProducts = asyncHandler(async (req, res) => {
@@ -22,6 +24,16 @@ exports.createProduct = asyncHandler(async (req, res) => {
         throw new Error('Not authorized as seller');
     }
 
+    const activeSubscription = await Subscription.findOne({
+        seller: req.user._id,
+        status: 'active',
+        endDate: { $gte: new Date() } 
+    });
+
+    if (!activeSubscription) {
+        return res.status(403).json({ message: 'Active subscription required to create products' });
+    }
+
     const product = new Product({
         name,
         description,
@@ -42,8 +54,7 @@ exports.getProductById = asyncHandler(async (req, res) => {
     if (product) {
         res.json(product);
     } else {
-        res.status(404);
-        throw new Error('Product not found');
+        res.status(404).send('Product not found');
     }
 });
 
@@ -88,12 +99,11 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
     if (!product) {
         res.status(404).send({ message: 'Could not find product' });
-        return;
+     
     }
 
     if (!req.user || req.user._id.toString() !== product.seller.toString()) {
-        res.status(401);
-        throw new Error('Not authorized to delete this product');
+        res.status(401).send('Not authorized to delete this product');
     }
 
 

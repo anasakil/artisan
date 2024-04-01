@@ -17,19 +17,17 @@ const protect = asyncHandler(async (req, res, next) => {
             next();
         } catch (error) {
             console.error(error);
-            res.status(401);
-            throw new Error('Not authorized, token failed');
+            res.status(401).send('Not authorized, token failed');
         }
     }
     if (!token) {
         res.status(401).json({ message: 'Authorization denied: No token provided' });
-        return; // Stop further execution in this callback
+        return; 
     }
     
 
     if (!token) {
-        res.status(401);
-        throw new Error('Not authorized, no token');
+        res.status(401).send('Not authorized, no token');
     }
 });
 
@@ -37,8 +35,7 @@ const protect = asyncHandler(async (req, res, next) => {
 const restrictTo = (...roles) => {
     return asyncHandler(async (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            res.status(403); // Forbidden
-            throw new Error('You do not have permission to perform this action');
+            res.status(403).send('You do not have permission to perform this action');
         }
 
         next();

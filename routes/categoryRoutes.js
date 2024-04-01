@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', getAllCategories);
 router.get('/:id', getCategoryById);
 
-// Routes below this line will use the protect and restrictTo middleware, making them accessible only to admins
+
 router.use(protect, restrictTo('admin'));
 
 router.post('/', createCategory);
