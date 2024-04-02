@@ -7,6 +7,7 @@ const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const swaggerUi = require('swagger-ui-express'); 
 const swaggerSpecs = require('./swagger/swaggerSpecs');
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', authRoutes);
+app.use('/api/admin/users', userRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/orders', orderRoutes);
