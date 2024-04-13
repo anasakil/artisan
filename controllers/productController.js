@@ -2,7 +2,14 @@ const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
 const Subscription = require('../models/Subscription'); 
 
-
+exports.getProductsByRegion = async (req, res) => {
+    try {
+      const products = await Product.find({ region: req.params.region });
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
 
 exports.listProducts = asyncHandler(async (req, res) => {
     let queryFilter = {};

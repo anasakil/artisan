@@ -11,13 +11,12 @@ const generateToken = (id) => {
 
 
 exports.registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password, role, paypalEmail } = req.body;
+  const { username, email, password, role } = req.body;
 
   if (!email || !password || !username) {
     res.status(400).send('Please add all fields');
   }
 
-  // Check if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400).send('User already exists');
@@ -28,7 +27,6 @@ exports.registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     role,
-    stripeAccountId,
   });
 
   if (user) {
@@ -37,7 +35,6 @@ exports.registerUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       role: user.role,
-      paypalEmail: user.paypalEmail,
       token: generateToken(user._id),
     });
   } else {

@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session'); 
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connectDB = require('./config/db.js');
@@ -17,10 +18,16 @@ const swaggerSpecs = require('./swagger/swaggerSpecs');
 connectDB();
 
 const app = express();
-
+app.use(cors()); 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: 'Artisannn',
+  resave: false,
+  saveUninitialized: true
+}));
+
 
 
 
