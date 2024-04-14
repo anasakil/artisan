@@ -1,5 +1,17 @@
 const request = require('supertest');
-const app = require('../server'); 
+const { app, startServer, stopServer } = require('../server');
+let server;
+
+beforeAll(() => {
+    server = startServer(3001); // Start server at the beginning of all tests
+});
+
+afterAll(() => {
+    stopServer(server); // Ensure server is stopped after all tests
+});
+
+module.exports = app;
+
 describe('User Endpoints', () => {
     // it('should create a new user', async () => {
     //     const res = await request(app)

@@ -1,27 +1,13 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 
-let mongoServer;
-
-module.exports = async () => {
-  mongoServer = new MongoMemoryServer();
-
-  console.log('Starting MongoDB in-memory server...');
-  const mongoUri = await mongoServer.getUri();
-  console.log(`Connected to MongoDB: ${mongoUri}`);
-
-  await mongoose.connect(mongoUri, {
+beforeAll(async () => {
+  const dbConnection = 'mongodb+srv://farawiakil:QE9uMObj1ldNssdo@cluster0.gpmspgl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+   await mongoose.connect(dbConnection, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
   });
+});
 
-  console.log('MongoDB connected.');
-
-  afterAll(async () => {
-    console.log('Disconnecting from MongoDB...');
-    await mongoose.disconnect();
-    await mongoServer.stop();
-    console.log('MongoDB disconnected.');
-  });
-};
+afterAll(async () => {
+  await mongoose.disconnect();
+});
