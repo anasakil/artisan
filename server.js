@@ -44,11 +44,20 @@ const PORT = process.env.PORT || 5000;
 function startServer(port) {
   return app.listen(port, () => console.log(`Server started on port ${port}`));
 }
-
 function stopServer(server) {
-  if (server) {
-    server.close(() => console.log('Server stopped'));
-  }
+  return new Promise((resolve, reject) => {
+    if (server) {
+      server.close((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log('Server stopped');
+          resolve();
+        }
+      });
+    } else {
+      resolve();
+    }
+  });
 }
-
 module.exports = { app, startServer, stopServer };
