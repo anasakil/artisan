@@ -1,5 +1,8 @@
 module.exports = {
-    testEnvironment: 'node',
-    setupFilesAfterEnv: ['./tests/setup.js'],  
-  };
-  
+  transformIgnorePatterns: [
+    "/node_modules/(?!bson).+\\.js$" 
+  ],
+  transform: {
+    "^.+\\.js$": "babel-jest", 
+  },
+};

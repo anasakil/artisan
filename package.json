@@ -29,6 +29,9 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/preset-env": "^7.24.4",
+    "babel-jest": "^29.7.0",
     "dotenv": "^16.4.5",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.1.8",
