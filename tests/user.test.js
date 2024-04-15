@@ -3,11 +3,11 @@ const { app, startServer, stopServer } = require('../server');
 let server;
 
 beforeAll(() => {
-  server = startServer(3001);  // Choose an appropriate port
+    server = startServer(3001); // Start server at the beginning of all tests
 });
 
-afterAll(async () => {
-  await stopServer(server);
+afterAll(() => {
+    stopServer(server); // Ensure server is stopped after all tests
 });
 
 module.exports = app;

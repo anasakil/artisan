@@ -24,7 +24,7 @@ exports.listProducts = asyncHandler(async (req, res) => {
 
 
 exports.createProduct = asyncHandler(async (req, res) => {
-    const { name, description, price, imageUrl, category } = req.body;
+    const { name, description, price, imageUrl, category , region  ,stock} = req.body;
     
     if (!req.user || req.user.role !== 'seller') {
         res.status(401);
@@ -48,6 +48,8 @@ exports.createProduct = asyncHandler(async (req, res) => {
         imageUrl,
         category,
         seller: req.user._id,
+        stock,
+        region
     });
 
     const createdProduct = await product.save();
@@ -95,6 +97,8 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     product.price = req.body.price || product.price;
     product.imageUrl = req.body.imageUrl || product.imageUrl;
     product.category = req.body.category || product.category;
+    product.region = req.body.region || product.region;
+    product.stock = req.body.stock || product.stock;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
