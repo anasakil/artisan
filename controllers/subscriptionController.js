@@ -8,7 +8,6 @@ exports.createStripeSubscription = asyncHandler(async (req, res) => {
     const basicPlanPriceId = 'price_1OwxRuCfxu4Ymg82m2nj6nzw'; 
 
     try {
-        //  Create or retrieve Stripe Customer
         let customers = await stripe.customers.list({ email });
         let customer = customers.data.length > 0 ? customers.data[0] : null;
 
