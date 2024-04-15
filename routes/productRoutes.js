@@ -1,9 +1,10 @@
 const express = require('express');
+const router = express.Router();
 const { listProducts, createProduct, getProductById, updateProduct, deleteProduct } = require('../controllers/productController');
 const { protect, restrictTo, optionalAuth } = require('../middleware/authMiddleware');
+const productsController = require('../controllers/productController'); 
 
-
-const router = express.Router();
+router.get('/:region', productsController.getProductsByRegion);
 
 router.route('/')
     .get( optionalAuth, listProducts)

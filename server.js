@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session'); 
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const connectDB = require('./config/db.js');
@@ -12,17 +13,18 @@ const orderRoutes = require('./routes/orderRoutes');
 const swaggerUi = require('swagger-ui-express'); 
 const swaggerSpecs = require('./swagger/swaggerSpecs');
 
-
-
 connectDB();
 
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
-
+app.use(session({
+  secret: 'Artisannn',
+  resave: false,
+  saveUninitialized: true
+}));
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', authRoutes);
@@ -35,9 +37,27 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
-  });
+});
 
 const PORT = process.env.PORT || 5000;
 
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+function startServer(port) {
+  return app.listen(port, () => console.log(`Server started on port ${port}`));
+}
+function stopServer(server) {
+  return new Promise((resolve, reject) => {
+    if (server) {
+      server.close((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log('Server stopped');
+          resolve();
+        }
+      });
+    } else {
+      resolve();
+    }
+  });
+}
+module.exports = { app, startServer, stopServer };

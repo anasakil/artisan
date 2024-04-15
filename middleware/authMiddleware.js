@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
-// Existing protect middleware remains unchanged
 const protect = asyncHandler(async (req, res, next) => {
     let token;
 
@@ -31,7 +30,6 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 });
 
-// Function to restrict routes to certain roles
 const restrictTo = (...roles) => {
     return asyncHandler(async (req, res, next) => {
         if (!roles.includes(req.user.role)) {
