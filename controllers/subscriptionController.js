@@ -19,19 +19,27 @@ exports.createStripeSubscription = asyncHandler(async (req, res) => {
                     default_payment_method: paymentMethodId,
                 },
             });
+        } else {
+            await stripe.paymentMethods.attach(paymentMethodId, { customer: customer.id });
+            await stripe.customers.update(customer.id, {
+                invoice_settings: {
+                    default_payment_method: paymentMethodId,
+                },
+            });
         }
-        await stripe.paymentMethods.attach(paymentMethodId, { customer: customer.id });
 
-
-        // Create the Stripe Subscription
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price: basicPlanPriceId }],
             expand: ['latest_invoice.payment_intent'],
         });
 
+        const user = await User.findById(req.user._id);
+
         await Subscription.create({
             seller: req.user._id, 
+            sellerName: user.username,
+            stripeid: user.stripeAccountId, 
             plan: 'Basic',
             status: subscription.status,
             paymentProcessor: 'Stripe',
@@ -50,3 +58,14 @@ exports.createStripeSubscription = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'Failed to create subscription', error: error.message });
     }
 });
+
+
+
+exports.getAllSubscriptions = async (req, res) => {
+    try {
+      const subscriptions = await Subscription.find();
+      res.json(subscriptions);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

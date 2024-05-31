@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Subscription = require('../models/Subscription');  
+
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
@@ -10,7 +12,7 @@ const generateToken = (id) => {
 
 
 exports.registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password, role ,imageUrl} = req.body;
 
   if (!email || !password || !username) {
     res.status(400).send('Please add all fields');
@@ -26,6 +28,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     role,
+    imageUrl,
   });
 
   if (user) {
@@ -34,6 +37,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       role: user.role,
+      imageUrl: user.imageUrl,
       token: generateToken(user._id),
     });
   } else {
@@ -62,14 +66,22 @@ exports.loginUser = asyncHandler(async (req, res) => {
 });
 
 
+
 exports.getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
-  if (user) {
-    res.json(user);
-  } else {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
     res.status(404);
     throw new Error('User not found');
   }
+
+  const subscription = await Subscription.findOne({ seller: userId }).sort({ endDate: -1 }).limit(1);
+
+  const userProfile = user.toObject(); 
+  userProfile.subscriptionStatus = subscription ? subscription.status : 'No subscription';
+
+  res.json(userProfile);
 });
 
 
@@ -90,7 +102,7 @@ exports.updateUserProfile = asyncHandler(async (req, res) => {
       username: updatedUser.username,
       email: updatedUser.email,
       role: updatedUser.role,
-      paypalEmail: updatedUser.paypalEmail,
+      password: updatedUser.password,
       token: generateToken(updatedUser._id),
     });
   } else {

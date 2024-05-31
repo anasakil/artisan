@@ -3,34 +3,44 @@ const Product = require('../models/Product');
 const User = require('../models/User'); 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+
+
 exports.placeOrder = async (req, res) => {
     try {
-        const { products, paymentMethodId } = req.body; 
+        const { products, paymentMethodId } = req.body;
+
+        // Validate request
+        if (!products || products.length === 0) {
+            return res.status(400).json({ message: 'No products provided' });
+        }
+
+        if (!paymentMethodId) {
+            return res.status(400).json({ message: 'No payment method provided' });
+        }
+
         const productIds = products.map(item => item.product);
+        console.log('Product IDs:', productIds); // Debugging log
+
+        // Fetch product details from the database
         const productDetails = await Product.find({ '_id': { $in: productIds } });
 
         if (productDetails.length === 0) {
             return res.status(400).json({ message: 'Products not found' });
         }
 
+        console.log('Product Details:', productDetails); // Debugging log
+
         const sellerId = productDetails[0].seller;
         const seller = await User.findById(sellerId);
-       
 
-        if (!seller || !seller.stripeAccountId && !seller[' stripeAccountId']) {
-            return res.status(404).json({ message: 'Seller not found or not set up for payments' });
-        }
-
-
-
-        if (!seller || !seller.stripeAccountId) {
+        if (!seller || (!seller.stripeAccountId && !seller['stripeAccountId'])) {
             return res.status(404).json({ message: 'Seller not found or not set up for payments' });
         }
 
         const totalAmount = productDetails.reduce((acc, product) => acc + product.price, 0);
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: totalAmount*100,
+            amount: totalAmount * 100,
             currency: 'usd',
             payment_method: paymentMethodId,
             automatic_payment_methods: {
@@ -101,12 +111,35 @@ exports.deleteBuyerOrder = async (req, res) => {
 
 exports.getSellerOrders = async (req, res) => {
     try {
-        const orders = await Order.find({ seller: req.user._id }).populate('products.product');
-        res.status(200).json(orders);
+        const orders = await Order.find({ seller: req.user._id })
+                                  .populate('products.product');
+
+        const totalOrders = orders.length;
+
+        const totalSales = orders.reduce((acc, order) => {
+            const orderTotal = order.products.reduce((sum, item) => {
+                if (item.product && item.product.price && item.quantity) {
+                    return sum + (item.product.price * item.quantity); 
+                }
+                return sum;
+            }, 0);
+            return acc + orderTotal;
+        }, 0);
+
+        const buyerIds = new Set(orders.map(order => order.buyer.toString()));  
+        const totalBuyers = buyerIds.size;
+
+        res.status(200).json({
+            totalOrders: totalOrders,
+            totalSales: totalSales,
+            totalBuyers: totalBuyers,
+            orders: orders 
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching orders', error: error.message });
     }
 };
+
 
 
 

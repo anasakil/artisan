@@ -6,9 +6,10 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  imageUrl: { type: String, required: false },
   role: { type: String, enum: ['buyer', 'seller', 'admin'], default: 'buyer' },
-  stripeAccountId: { type: String ,required: function() { return this.role === 'seller'; }},
-  paypalEmail: { type: String, required: function() { return this.role === 'seller'; } },
+  stripeAccountId: { type: String },
+  paypalEmail: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

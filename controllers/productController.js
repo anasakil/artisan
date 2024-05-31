@@ -10,6 +10,17 @@ exports.getProductsByRegion = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+  exports.getProductsByCategory = asyncHandler(async (req, res) => {
+    const { categoryId } = req.params;
+
+    try {
+        const products = await Product.find({ category: categoryId }).populate('category', 'name');
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 exports.listProducts = asyncHandler(async (req, res) => {
     let queryFilter = {};
@@ -19,6 +30,11 @@ exports.listProducts = asyncHandler(async (req, res) => {
     }
     const products = await Product.find(queryFilter);
   
+    res.json(products);
+});
+
+exports.listProductsForSeller = asyncHandler(async (req, res) => {
+    const products = await Product.find({ seller: req.user._id });
     res.json(products);
 });
 

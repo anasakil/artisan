@@ -18,7 +18,6 @@ async function createPaymentMethod(paymentMethodData) {
     }
 }
 
-// Example usage:
 const paymentMethodData = {
     number: '4242424242424242',
     exp_month: 8,

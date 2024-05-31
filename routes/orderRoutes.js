@@ -6,7 +6,7 @@ const { protect, restrictTo } = require('../middleware/authMiddleware');
 router.post('/buyer', protect, orderController.placeOrder);
 router.get('/buyer/myorders', protect, orderController.viewOrderHistory);
 router.put('/buyer/orders/:orderId', protect, orderController.updateBuyerOrder);
-router.delete('/buyer/orders/:orderId', protect, orderController.deleteBuyerOrder);
+router.delete('/buyer/:orderId', protect, orderController.deleteBuyerOrder);
 
 
 

@@ -6,6 +6,10 @@ const subscriptionSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    sellerName: {
+        type: String,
+        required: true,
+      },
     plan: {
         type: String,
         required: true,
@@ -18,9 +22,9 @@ const subscriptionSchema = new mongoose.Schema({
     paymentProcessor: {
         type: String,
         required: true,
-        enum: ['Stripe', 'PayPal'], // Add more as needed
+        enum: ['Stripe', 'PayPal'], 
     },
-    subscriptionId: { // ID from Stripe or PayPal
+    subscriptionId: {
         type: String,
         required: true
     },
