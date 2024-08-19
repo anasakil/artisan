@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   paypalEmail: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  resetPasswordToken: { type: String }, 
+  resetPasswordExpire: { type: Date },    
 });
 
 userSchema.pre('save', async function(next) {

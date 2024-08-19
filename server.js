@@ -48,36 +48,6 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
   });
 
-  // let server;
-
-  // function startServer(port) {
-  //     if (!server) {
-  //         server = app.listen(port, () => console.log(`Server started on port ${port}`));
-  //     }
-  //     return server;
-  // }
-  
-  // function stopServer() {
-  //     return new Promise((resolve, reject) => {
-  //         if (server) {
-  //             server.close((err) => {
-  //                 if (err) {
-  //                     console.error('Failed to close server', err);
-  //                     reject(err);
-  //                 } else {
-  //                     console.log('Server stopped');
-  //                     server = null;
-  //                     resolve();
-  //                 }
-  //             });
-  //         } else {
-  //             resolve(); // If no server to close
-  //         }
-  //     });
-  // }
-  
-  // module.exports = { app, startServer, stopServer };
-
 
 
 

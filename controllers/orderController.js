@@ -3,13 +3,10 @@ const Product = require('../models/Product');
 const User = require('../models/User'); 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-
-
 exports.placeOrder = async (req, res) => {
     try {
-        const { products, paymentMethodId } = req.body;
+        const { products, paymentMethodId, shippingAddress } = req.body;
 
-        // Validate request
         if (!products || products.length === 0) {
             return res.status(400).json({ message: 'No products provided' });
         }
@@ -18,17 +15,20 @@ exports.placeOrder = async (req, res) => {
             return res.status(400).json({ message: 'No payment method provided' });
         }
 
-        const productIds = products.map(item => item.product);
-        console.log('Product IDs:', productIds); // Debugging log
+        if (!shippingAddress || !shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zipCode || !shippingAddress.country) {
+            return res.status(400).json({ message: 'Incomplete shipping address provided' });
+        }
 
-        // Fetch product details from the database
+        const productIds = products.map(item => item.product);
+        console.log('Product IDs:', productIds); 
+
         const productDetails = await Product.find({ '_id': { $in: productIds } });
 
         if (productDetails.length === 0) {
             return res.status(400).json({ message: 'Products not found' });
         }
 
-        console.log('Product Details:', productDetails); // Debugging log
+        console.log('Product Details:', productDetails); 
 
         const sellerId = productDetails[0].seller;
         const seller = await User.findById(sellerId);
@@ -58,6 +58,13 @@ exports.placeOrder = async (req, res) => {
             seller: sellerId,
             status: 'placed',
             paymentIntentId: paymentIntent.id,
+            shippingAddress: {
+                street: shippingAddress.street,
+                city: shippingAddress.city,
+                state: shippingAddress.state,
+                zipCode: shippingAddress.zipCode,
+                country: shippingAddress.country
+            }
         });
 
         await order.save();
@@ -67,6 +74,7 @@ exports.placeOrder = async (req, res) => {
         res.status(500).json({ message: 'Error placing order', error: error.message });
     }
 };
+
 
 
 exports.viewOrderHistory = async (req, res) => {

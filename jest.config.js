@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],  // Correct path to setup.js
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],  
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
