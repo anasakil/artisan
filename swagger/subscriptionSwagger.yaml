@@ -1,0 +1,77 @@
+paths:
+  /api/subscriptions/stripe/create:
+    post:
+      summary: Create a new Stripe subscription for a seller
+      tags:
+        - Subscriptions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StripeSubscriptionCreate'
+      responses:
+        201:
+          description: Stripe subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+components:
+  schemas:
+    Subscription:
+      type: object
+      properties:
+        seller:
+          type: string
+          description: 'ID of the seller'
+          example: '5f8d04034b432b3a2e3b9f21'
+        plan:
+          type: string
+          example: 'Basic Plan'
+        status:
+          type: string
+          enum: ['active', 'inactive', 'cancelled']
+          example: 'active'
+        paymentProcessor:
+          type: string
+          enum: ['Stripe', 'PayPal']
+          example: 'Stripe'
+        subscriptionId:
+          type: string
+          description: 'ID of the subscription from the payment processor'
+          example: 'sub_123ABC'
+        startDate:
+          type: string
+          format: date-time
+          example: '2021-10-15T00:00:00.000Z'
+        endDate:
+          type: string
+          format: date-time
+          example: '2022-10-15T00:00:00.000Z'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StripeSubscriptionCreate:
+      type: object
+      properties:
+        plan:
+          type: string
+          example: 'Basic Plan'
+        endDate:
+          type: string
+          format: date-time
+          example: '2022-10-15T00:00:00.000Z'
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

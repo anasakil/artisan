@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: Artisan API
+  version: 1.0.0
+  description: API documentation for Artisan application's product management
+
+paths:
+  /api/products:
+    get:
+      summary: List all products
+      tags:
+        - Products
+      responses:
+        200:
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        201:
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      x-restrictTo:
+        roles:
+          - seller
+
+  api/products/{id}:
+    get:
+      summary: Get a product by ID
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+    put:
+      summary: Update a product by ID
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      x-restrictTo:
+        roles:
+          - seller
+
+    delete:
+      summary: Delete a product by ID
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Product deleted successfully
+      x-restrictTo:
+        roles:
+          - seller
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - imageUrl
+        - category
+        - seller
+      properties:
+        name:
+          type: string
+          example: 'Sample Product'
+        description:
+          type: string
+          example: 'This is a sample product description.'
+        price:
+          type: number
+          example: 9.99
+        imageUrl:
+          type: string
+          example: 'http://example.com/image.jpg'
+        category:
+          type: string
+          description: 'ID of the category to which the product belongs'
+          example: '5f8d04034b432b3a2e3b9f21'
+        seller:
+          type: string
+          description: 'ID of the user who is selling the product'
+          example: '5f8d04034b432b3a2e3b9f22'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2021-10-15T14:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-10-15T14:30:00.000Z'
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
