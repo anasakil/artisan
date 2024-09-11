@@ -34,7 +34,9 @@ app.use(session({
 
 
 
-app.use('/', res.json("hello" );
+app.get('/', (req, res) => {
+  res.send('Welcome to the Home Page');
+});
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', authRoutes);
